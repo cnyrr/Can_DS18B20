@@ -131,7 +131,7 @@ void Can_DS18B20::skipROM() {
 void Can_DS18B20::alarmSearch() {
   writeBytes(0xEC, 1);
 
-  _is_alarm_detected = readSlot();
+  _is_alarm_detected = !readSlot();
 }
 
 // ----- DS18B20 Function Command Set ----- //
