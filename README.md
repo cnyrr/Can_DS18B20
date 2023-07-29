@@ -9,7 +9,8 @@ Can_DS18B20 ds18b20(8);
 ```
 This will create a DS18B20 object and fetch scratchpad contents, power mode and ROM code. 
 ## Using Commands
-All commands must follow this sequence or you will encounter problems.
+All commands must follow this sequence or you will encounter problems. 
+Note: searchAlarm() is a ROM command.
 ```c++
 // Initialization
 ds18b20.reset();
