@@ -114,6 +114,7 @@ void Can_DS18B20::readROM() {
     // Bitwise OR every bit to their place.
     _rom[bit_position/8] |= (readSlot() << (bit_position % 8));
   }
+
 }
 
 void Can_DS18B20::matchROM() {
@@ -148,7 +149,7 @@ void Can_DS18B20::convertT() {
     while(readSlot() == 0){;} 
   }
 }
-
+/*
 void Can_DS18B20::writeScratchpad(int8_t _new_high_alarm, int8_t _new_low_alarm, uint8_t _new_resolution) {
   writeBytes(0x4E, 1);
 
@@ -156,7 +157,7 @@ void Can_DS18B20::writeScratchpad(int8_t _new_high_alarm, int8_t _new_low_alarm,
   uint32_t constructed_byte = 0;
 
   // Resolution range is 12 to 9 bits.
-  if (_new_resolution > 12 || _new_resolution < 9) {_new_resolution = 12;}
+  if (_new_resolution < 9 || _new_resolution > 12) {_new_resolution = 12;}
   else {_new_resolution -= 9;}
 
   // Third byte is configuration register.
@@ -169,11 +170,27 @@ void Can_DS18B20::writeScratchpad(int8_t _new_high_alarm, int8_t _new_low_alarm,
   constructed_byte |= ((int32_t) (_new_high_alarm)) & 0xFF;
 
   writeBytes(constructed_byte, 3);
+}*/
+
+void Can_DS18B20::writeScratchpad(int8_t _new_high_alarm, int8_t _new_low_alarm, uint8_t _new_resolution) {
+  writeBytes(0x4E, 1);
+
+  writeBytes(_new_high_alarm, 1);
+
+  writeBytes(_new_low_alarm, 1);
+
+  // Resolution range is 12 to 9 bits.
+  if (_new_resolution < 9 || _new_resolution > 12) {_new_resolution = 3;}
+  else {_new_resolution -= 9;}
+
+  // Only bit 6 and 5 matter, sensor doesn't overwrite rest.
+  writeBytes((_new_resolution << 5), 1);
+
 }
 
 void Can_DS18B20::readScratchpad() {
   // Temporarily holds scratchpad data.
-  int8_t scratchpad[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+  uint8_t scratchpad[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
   writeBytes(0xBE, 1);
   
@@ -182,8 +199,6 @@ void Can_DS18B20::readScratchpad() {
     scratchpad[bit_position/8] |= (readSlot() << (bit_position % 8));
   }
 
-  /* TO DO: Implement CRC. */
-
   _resolution = (scratchpad[4] >> 5) + 9;
 
   _alarm_low = scratchpad[3];
@@ -191,6 +206,7 @@ void Can_DS18B20::readScratchpad() {
   _alarm_high = scratchpad[2];
 
   _temperature = ((float) ((((int16_t) scratchpad[1]) << 8) | (scratchpad[0] & 0xFF)) / 16);
+
 }
 
 void Can_DS18B20::copyScratchpad() {

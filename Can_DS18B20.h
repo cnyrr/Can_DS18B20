@@ -85,8 +85,8 @@ class Can_DS18B20 {
       // Writes up to 4 bytes into OneWire bus.
       void writeBytes(uint32_t value, uint8_t byte_count);
 
-      // Calculates CRC.
-      /* Not implemented yet. */
+      // Calculates CRC-8.
+      uint8_t calculateCRC(uint8_t* data_address, uint8_t byte_count);
 
   private:
     const uint8_t _DATAPIN;
